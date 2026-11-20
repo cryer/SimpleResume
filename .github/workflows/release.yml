@@ -1,0 +1,67 @@
+name: Package Windows x64
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    env:
+      TARGET: x86_64-pc-windows-msvc
+      VERSION: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python scripts/release.py --check-tag "$env:VERSION"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal --component rust-docs
+      - run: rustup default stable-x86_64-pc-windows-msvc
+      - run: npm ci
+      - run: cargo fetch --locked --manifest-path src-tauri/Cargo.toml --target $env:TARGET
+      - run: npm test
+      - run: npm run desktop:build -- --ci --no-bundle --target $env:TARGET -- --locked --offline
+      - run: cargo test --locked --offline --manifest-path src-tauri/Cargo.toml --target $env:TARGET
+      - run: python -B scripts/test_release.py
+      - run: python scripts/release.py "$env:VERSION"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resume-studio-${{ github.ref_name }}-windows-x64
+          path: |
+            release-assets/*.zip
+            release-assets/*.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: resume-studio-${{ github.ref_name }}-windows-x64
+          path: release-assets
+      - name: Publish the verified release assets
+        working-directory: release-assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          sha256sum --check -- *.zip.sha256
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" *.zip *.zip.sha256 --clobber
+          else
+            gh release create "$TAG" *.zip *.zip.sha256 --verify-tag --title "SimpleResume $TAG" --generate-notes
+          fi

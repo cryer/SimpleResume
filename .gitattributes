@@ -2,3 +2,6 @@
 *.cmd text eol=crlf
 *.png binary
 *.ico binary
+
+# Retain upstream legal text verbatim.
+scripts/licenses/*.txt -whitespace
