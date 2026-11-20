@@ -1,25 +1,38 @@
 name: Package Windows x64
 on:
   push:
-    tags: ['[0-9]+.[0-9]+.[0-9]+']
+    tags: ['*.*.*']
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag, for example 0.1.0'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
+env:
+  RELEASE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '0.1.0' }}
+
 jobs:
   package:
+    if: >-
+      github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' ||
+      github.event.head_commit.message == 'ci: bootstrap the initial tagged release'
     runs-on: windows-2022
     env:
       TARGET: x86_64-pc-windows-msvc
-      VERSION: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python scripts/release.py --check-tag "$env:VERSION"
+      - run: python scripts/release.py --check-tag "$env:RELEASE_TAG"
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -32,10 +45,10 @@ jobs:
       - run: npm run desktop:build -- --ci --no-bundle --target $env:TARGET -- --locked --offline
       - run: cargo test --locked --offline --manifest-path src-tauri/Cargo.toml --target $env:TARGET
       - run: python -B scripts/test_release.py
-      - run: python scripts/release.py "$env:VERSION"
+      - run: python scripts/release.py "$env:RELEASE_TAG"
       - uses: actions/upload-artifact@v4
         with:
-          name: resume-studio-${{ github.ref_name }}-windows-x64
+          name: resume-studio-${{ env.RELEASE_TAG }}-windows-x64
           path: |
             release-assets/*.zip
             release-assets/*.zip.sha256
@@ -50,14 +63,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: resume-studio-${{ github.ref_name }}-windows-x64
+          name: resume-studio-${{ env.RELEASE_TAG }}-windows-x64
           path: release-assets
       - name: Publish the verified release assets
         working-directory: release-assets
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ env.RELEASE_TAG }}
         run: |
           sha256sum --check -- *.zip.sha256
           if gh release view "$TAG" >/dev/null 2>&1; then
