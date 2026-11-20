@@ -6,7 +6,7 @@
 
 ## 下载与运行
 
-1. 从 [GitHub Releases](https://github.com/cryer/SimpleResume/releases) 下载 **Windows x64** 发布包并解压。GitHub 自动生成的 *Source code* 是源码，不是可执行程序。
+1. 从 [GitHub Releases](https://github.com/cryer/SimpleResume/releases) 下载 **Windows x64** 发布包并解压。
 2. 安装 [TeX Live](https://www.tug.org/texlive/) 或配置 [TinyTeX](https://yihui.org/tinytex/)，确保 `xelatex --version` 和 `xdvipdfmx --version` 能在终端执行。中文模板使用 `ctex`、`geometry`、`fandol` 和 `lm-math`；精简 TeX 安装可用 `tlmgr install ctex geometry fandol lm-math` 补齐。修改 PATH 后重新启动程序。
 3. 打开解压目录中的 `.exe`。如果系统缺少 WebView2，请安装 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)。应用不会自动下载 TeX 或上传简历。
 
@@ -24,7 +24,7 @@
 | macOS / Linux | Tauri 和 Rust 有对应平台实现，但尚未在这些系统上验证原生构建、桌面启动时的 TeX 查找和完整导出流程 | 暂不提供 `.app`、`.dmg`、`.deb` 或 AppImage |
 | 现代浏览器 | 可从源码运行编辑画布；浏览器不能直接启动本地 XeLaTeX | 无独立 PDF 排版服务 |
 
-因此本项目**有跨平台架构，不代表各平台均已获支持**。发布其他平台应使用对应平台的构建机，并先验证原生 WebView、系统依赖和真实 PDF 链路；Windows 二进制不能直接在其他平台运行。
+因此本项目**有跨平台架构，不代表各平台均已获支持**。
 
 ## 从源码运行
 
@@ -55,10 +55,6 @@ cargo clippy --locked --all-targets -- -D warnings
 
 浏览器测试会从仓库中的 `.tex` 源文件生成两字样例 PDF，不分发内嵌字体的测试成品。默认使用 Edge；其他环境可安装 Playwright Chromium 并设置 `PLAYWRIGHT_CHANNEL=chromium`。完整 Rust 测试还需要 `pdftotext` 在 PATH 上以及项目根目录的 npm 依赖。
 
-## 贡献、版本与许可
+## 许可
 
-欢迎通过 [Issues](https://github.com/cryer/SimpleResume/issues) 报告问题或提交 Pull Request。排版问题请附系统、TeX 版本及可公开的最小示例，不要附带真实简历的个人信息。请使用英文 [Conventional Commits](https://www.conventionalcommits.org/) 提交信息，例如 `fix(renderer): preserve inline spacing`。
-
-维护者推送版本标签（如 `0.1.0`）后，[发布工作流](.github/workflows/release.yml) 从该标签的源码构建 Windows x64 程序并上传到对应的 GitHub Release。二进制不进入 Git 历史。
-
-项目原创源码按 [MIT License](LICENSE) 发布；第三方依赖、PDF.js 资源及其字体等仍适用各自许可。中文简历布局参考 [billryan/resume](https://github.com/billryan/resume)，不要求使用其宏或模板文件。
+项目原创源码按 [MIT License](LICENSE) 发布；第三方依赖、PDF.js 资源及其字体等仍适用各自许可。
