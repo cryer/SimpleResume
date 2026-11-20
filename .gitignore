@@ -1,0 +1,44 @@
+# Dependencies, copied PDF.js assets and build outputs
+node_modules/
+/dist/
+/public/pdfjs-resources/
+/src-tauri/target/
+/src-tauri/gen/
+/release/
+/release-assets/
+/artifacts/
+/scripts/.verify/
+__pycache__/
+*.py[cod]
+
+# Local tools, profiles, private drafts, credentials and machine settings
+.local-tex/
+.star/
+AGENTS.md
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.resume.json
+*.resumeproj
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Tests, coverage, logs and TeX intermediates
+/test-results/
+/playwright-report/
+/coverage/
+*.log
+*.aux
+*.xdv
+*.synctex.gz
+*.pdf
+*.exe
+*.dmg
+*.AppImage
+*.msi
+*.zip

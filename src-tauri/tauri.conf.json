@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Resume Studio",
+  "version": "0.1.0",
+  "identifier": "io.resumestudio.editor",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [{ "label": "main", "title": "Resume Studio", "width": 1200, "height": 800 }],
+    "security": { "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' blob: ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:; object-src 'none'; img-src 'self' data: blob:; worker-src 'self' blob:" }
+  },
+  "bundle": { "active": true, "icon": ["icons/icon.ico", "icons/icon.png"] }
+}

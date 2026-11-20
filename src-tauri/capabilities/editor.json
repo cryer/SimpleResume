@@ -1,0 +1,6 @@
+{
+  "identifier": "editor",
+  "description": "Only the local editor window can render a resume and save/reveal a PDF in Downloads.",
+  "windows": ["main"],
+  "permissions": ["allow-render-pdf", "allow-download-pdf"]
+}
